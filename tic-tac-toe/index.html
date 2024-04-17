@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <div id="board">
+        <!-- This is where the Tic Tac Toe board will be rendered -->
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Add your JavaScript code here to handle game logic and interactions with Socket.io
+        // For example, you can listen for 'connect' event and emit 'join' event to the server
+        socket.on('connect', () => {
+            socket.emit('join', 'Tic Tac Toe');
+        });
+
+        // You can also listen for 'update' event from the server and update the game board
+        socket.on('update', (board) => {
+            // Update the game board
+        });
+    </script>
+</body>
+</html>
