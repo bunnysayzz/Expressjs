@@ -1,35 +1,44 @@
-// Import required modules
 const express = require('express');
 const { Pool } = require('pg');
 
-// Create an instance of Express
 const app = express();
+const port = 3002;
 
-// Define the PostgreSQL connection configuration
 const pool = new Pool({
-  user: 'PostgreSQL', // Your PostgreSQL username
+  user: 'postgres',
   host: 'localhost',
-  database: 'db1', // Your PostgreSQL database name
-  password: '8969', // Your PostgreSQL password
-  port: 5432, // Default PostgreSQL port
+  database: 'db1',
+  password: '8969',
+  port: 5432
 });
 
-// Define a route
-app.get('/', async (req, res) => {
-  try {
-    // Example query: Select all rows from a table called 'example_table'
-    const client = await pool.connect();
-    const result = await client.query('SELECT * FROM example_table');
-    client.release(); // Release the client back to the pool
-    res.json(result.rows); // Send the query result as JSON response
-  } catch (err) {
-    console.error('Error executing query', err);
-    res.status(500).send('Error executing query');
-  }
+app.use(express.json());
+
+// Get all todos
+app.get('/todos', (req, res) => {
+  pool.query('SELECT * FROM todos', (error, result) => {
+    if (error) {
+      console.error("Error fetching todos:", error);
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      res.json(result.rows);
+    }
+  });
 });
 
-// Start the server on port 4000
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Post new todo
+app.post('/todos', (req, res) => {
+  const { title, completed } = req.body;
+  pool.query('INSERT INTO todos (title, completed) VALUES ($1, $2)', [title, completed], (error) => {
+    if (error) {
+      console.error('Error creating todo:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      res.status(201).json({ message: 'Todo created successfully' });
+    }
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server started on port ${port}`);
 });
